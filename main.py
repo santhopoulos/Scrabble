@@ -21,28 +21,36 @@ isGameOver = False
 # Set active player
 active_player = pHuman
 
-# Get player choice (1-4)
-playerChoice = int(input("Select from options 1-4 : "))
+# Get player choice (1-4) and validity test for user input
+playerChoice = input("Select from options 1-4: ")
+while playerChoice not in ["1", "2", "3", "4"]:
+    game.displayStartingScreen()
+    print()
+    playerChoice = input("Select from options 1-4: ")
+playerChoice = int(playerChoice)
+
 if playerChoice == 1:
     print("Option1")
     game.printScore(pHuman, pComputer)
 elif playerChoice == 2:
     print("Option2")
 elif playerChoice == 3:
-    while not isGameOver:
+    while not isGameOver and sak.numberOfLetters > 0:
         # Print information about the game
         game.printGameInfo(active_player, sak)
         # Read word and validate it
         word = game.readWord(active_player, sak)
+        if word == 'q':
+            game.gameOver(pHuman, pComputer)
         # Check if word exists
-        exists = game.wordExists(active_player, word)
-        if exists:
+        elif word == 'p':
+            game.passTurn(sak, active_player)
+        else:
             # calculate word points and add it to the score of the active player
             game.calculateWordPoints(active_player, word)
+            #
             game.updateSak(sak, active_player, word)
             game.printGameInfo(active_player, sak)
-        else:
-            print(f"Word {word} does not exist")
         # Change active player
         active_player = game.changePlayer(active_player, pHuman, pComputer)
 

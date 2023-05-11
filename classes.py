@@ -1,3 +1,4 @@
+import json
 import random
 import sys
 
@@ -133,6 +134,7 @@ class Computer(Player):
 
 
 class Game:
+    wordsformed = 0
 
     def __init__(self, gameName):
         self.gameName = gameName
@@ -155,15 +157,12 @@ class Game:
         while True:
             word = input("Enter your word or press 'p' to pass your turn or press 'q' to quit: ")
             if word == 'q':
-                # Quit game
-                print("Goodbye!")
-                self.gameOver()
+                return word
             elif word == 'p':
-                self.passTurn(sak, active_player)
-                return
-
-            # TODO: add functionality
-            elif self.validateWord(active_player, word):
+                # self.passTurn(sak, active_player)
+                return 'p'
+            # Check if word cant be formed with the available letters and if it exists in the greek7.txt
+            elif self.validateWord(active_player, word) and self.wordExists(active_player, word):
                 return word
             else:
                 print("Invalid word. Please try again.")
@@ -173,6 +172,7 @@ class Game:
         available_letters = player.current_letters.copy()  # create a copy of current_letters
         for letter in word:
             if letter not in available_letters:
+                print(f"---Word '{word}' can't be formed with the available letters---")
                 return False
             available_letters.remove(letter)
         return True
@@ -182,7 +182,9 @@ class Game:
         with open('greek7.txt', 'r', encoding='utf-8') as f:
             for line in f:
                 if word == line.strip():
+                    self.wordsformed += 1
                     return True
+        print(f"---Word '{word}' does not exist---")
         return False
 
     def calculateWordPoints(self, player, word):
@@ -206,6 +208,8 @@ class Game:
         print("******************************************************")
 
     def setup(self, pHuman, pComputer, sak):
+        # Show last game stats
+        self.loadLastGameStats()
         # Show starting screen
         self.displayStartingScreen()
         # Initialize sak for human player
@@ -213,7 +217,24 @@ class Game:
         # Initialize sak for pc player
         pComputer.current_letters = sak.randomizeSak()
 
-    def gameOver(self):
+    # def gameOver(self):
+    #     # Print gameOver info and declare the winner
+    #     # Save in a file game info like scores, number of words formed
+    #     sys.exit()
+
+    def gameOver(self, pHuman, pComputer):
+        if pHuman.score > pComputer.score:
+            winner = pHuman.name
+        elif pHuman.score < pComputer.score:
+            winner = pComputer.name
+        else:
+            winner = 'Game is a tie'
+        print("Goodbye!")
+        print(f"Player: {pHuman.name} - Score: {pHuman.score} ")
+        print(f"Player: {pComputer.name} - Score: {pComputer.score}")
+        print(f"Winner: {winner}")
+        # Save in a file game info like scores, number of words formed
+        self.saveGameStats(pHuman, pComputer)
         sys.exit()
 
     def updateSak(self, sak, active_player, word):
@@ -226,10 +247,10 @@ class Game:
 
     def passTurn(self, sak, active_player):
         sak.putBackLetters(active_player.current_letters)
-        active_player.current_letters = sak.getLetters(7)
-        print("TURN PASSED. NEW LETTERS:", active_player.current_letters)
-        print("LETTERS IN THE SAK:", sak.numberOfLetters)
-        print(sak.LETTER_QUANTITY)
+        active_player.current_letters = sak.getLetters(len(active_player.current_letters))
+        print("Turn passed. New available letters: ", active_player.current_letters)
+        # print("LETTERS IN THE SAK:", sak.numberOfLetters)
+        # print(sak.LETTER_QUANTITY)
 
     def changePlayer(self, active_player, pHuman, pComputer):
         if active_player == pHuman:
@@ -237,3 +258,38 @@ class Game:
         else:
             active_player = pHuman
         return active_player
+
+    def saveGameStats(self, pHuman, pComputer):
+        stats = {
+            "human_score": pHuman.score,
+            "computer_score": pComputer.score,
+            "human_name": pHuman.name,
+            "computer_name": pComputer.name,
+            "words_formed": self.wordsformed
+        }
+        with open("lastgamestats.json", "w") as f:
+            json.dump(stats, f)
+
+    def loadLastGameStats(self):
+        try:
+            with open("lastgamestats.json", "r") as f:
+                stats = json.load(f)
+
+            # extract the stats from the JSON object
+            human_score = stats["human_score"]
+            human_name = stats["human_name"]
+            computer_score = stats["computer_score"]
+            computer_name = stats["computer_name"]
+            words_formed = stats["words_formed"]
+
+            # print the stats to the console
+            print("-------------------------------------------------")
+            print("Last game stats:")
+            print(f"Player: {human_name} - Score {human_score}")
+            print(f"Player: {computer_name} - Score {computer_score}")
+            print(f"Words formed: {words_formed}")
+            print("-------------------------------------------------")
+        except FileNotFoundError:
+            print("-------------------------------------------------")
+            print("No previous game stats found!")
+            print("-------------------------------------------------")
