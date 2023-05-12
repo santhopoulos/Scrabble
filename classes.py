@@ -1,7 +1,7 @@
 import json
 import random
 import sys
-from itertools import permutations
+from itertools import chain, combinations, permutations
 
 LETTER_VALUES = {
     "Α": 1,
@@ -137,6 +137,7 @@ class Computer(Player):
         pass
 
     def minLetters(self, game):
+        print("^^^^^^^^minLetters algorithm^^^^^^^^")
         # Get all permutations of the available letters, starting with length 2
         perms = []
         for i in range(2, len(self.current_letters) + 1):
@@ -151,32 +152,25 @@ class Computer(Player):
                     print("word played by pc:", word)
                     game.wordsformed += 1
                     return word
-        print("Computer could not find valid word")
-        return None
+        print("Computer could not find valid word. Computer is passing its turn!")
+        return 'p'
 
     def maxLetters(self, game):
-        from itertools import permutations
-
-        # Get all permutations of the available letters, starting with length len(current_letters)
-        perms = []
+        print("^^^^^^^^Max letters algorithm^^^^^^^^")
         for i in range(len(self.current_letters), 1, -1):
-            for p in permutations(self.current_letters, i):
-                perms.append(''.join(p))
-
-        # Find the first valid word in the dictionary (assuming uppercase)
-        with open('greek7.txt', 'r', encoding='utf-8') as f:
-            for line in f:
-                word = line.strip()
-                if word in perms:
-                    print("Word played by computer: ", word)
-                    game.wordsformed += 1
-                    return word
-        print("Computer could not find valid word")
-        return None
+            perms = [''.join(p) for p in permutations(self.current_letters, i)]
+            with open('greek7.txt', 'r', encoding='utf-8') as f:
+                for line in f:
+                    word = line.strip()
+                    if word in perms:
+                        print("Word played by computer: ", word)
+                        game.wordsformed += 1
+                        return word
+        print("Computer could not find valid word. Computer is passing its turn!")
+        return 'p'
 
     def smart(self, game):
-        from itertools import chain, combinations, permutations
-
+        print("^^^^^^^^Smart algorithm^^^^^^^^")
         max_letters = len(self.current_letters)
 
         # Get all permutations of the available letters, from length 2 to max_letters
@@ -197,7 +191,8 @@ class Computer(Player):
         if word_points:
             return max(word_points, key=word_points.get)
         else:
-            return None
+            print("Computer could not find valid word. Computer is passing its turn!")
+            return 'p'
 
 
 class Game:
@@ -226,7 +221,6 @@ class Game:
             if word == 'q':
                 return word
             elif word == 'p':
-                # self.passTurn(sak, active_player)
                 return 'p'
             # Check if word cant be formed with the available letters and if it exists in the greek7.txt
             elif self.validateWord(active_player, word) and self.wordExists(active_player, word):
