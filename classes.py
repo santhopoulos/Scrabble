@@ -1,6 +1,7 @@
 import json
 import random
 import sys
+from itertools import permutations
 
 LETTER_VALUES = {
     "Α": 1,
@@ -132,6 +133,72 @@ class Computer(Player):
     def __init__(self, name):
         super().__init__(name)
 
+    def play(self):
+        pass
+
+    def minLetters(self, game):
+        # Get all permutations of the available letters, starting with length 2
+        perms = []
+        for i in range(2, len(self.current_letters) + 1):
+            for p in permutations(self.current_letters, i):
+                perms.append(''.join(p))
+
+        # Find the first valid word in the dictionary (assuming uppercase)
+        with open('greek7.txt', 'r', encoding='utf-8') as f:
+            for line in f:
+                word = line.strip()
+                if word in perms:
+                    print("word played by pc:", word)
+                    game.wordsformed += 1
+                    return word
+        print("Computer could not find valid word")
+        return None
+
+    def maxLetters(self, game):
+        from itertools import permutations
+
+        # Get all permutations of the available letters, starting with length len(current_letters)
+        perms = []
+        for i in range(len(self.current_letters), 1, -1):
+            for p in permutations(self.current_letters, i):
+                perms.append(''.join(p))
+
+        # Find the first valid word in the dictionary (assuming uppercase)
+        with open('greek7.txt', 'r', encoding='utf-8') as f:
+            for line in f:
+                word = line.strip()
+                if word in perms:
+                    print("Word played by computer: ", word)
+                    game.wordsformed += 1
+                    return word
+        print("Computer could not find valid word")
+        return None
+
+    def smart(self, game):
+        from itertools import chain, combinations, permutations
+
+        max_letters = len(self.current_letters)
+
+        # Get all permutations of the available letters, from length 2 to max_letters
+        perms = chain.from_iterable(permutations(self.current_letters, r) for r in range(2, max_letters + 1))
+
+        # Find all valid words in the dictionary (assuming uppercase)
+        valid_words = set()
+        with open('greek7.txt', 'r', encoding='utf-8') as f:
+            for line in f:
+                word = line.strip()
+                if word in perms:
+                    valid_words.add(word)
+
+        # Calculate the point value of each valid word
+        word_points = {word: game.calculateWordPoints(word) for word in valid_words}
+
+        # Find the word with the highest point value
+        if word_points:
+            return max(word_points, key=word_points.get)
+        else:
+            return None
+
 
 class Game:
     wordsformed = 0
@@ -187,15 +254,12 @@ class Game:
         print(f"---Word '{word}' does not exist---")
         return False
 
-    def calculateWordPoints(self, player, word):
+    def calculateWordPoints(self, word):
         """Calculates the point value of a word based on the global LETTER_VALUES dictionary"""
         word_points = 0
         for letter in word:
             letter_points = LETTER_VALUES.get(letter, 99999)
             word_points += letter_points
-        # Update player's score
-        player.score += word_points
-        # Return word points
         return word_points
 
     def printGameInfo(self, player, sak):

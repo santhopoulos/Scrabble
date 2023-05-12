@@ -39,7 +39,10 @@ elif playerChoice == 3:
         # Print information about the game
         game.printGameInfo(active_player, sak)
         # Read word and validate it
-        word = game.readWord(active_player, sak)
+        if active_player == pHuman:
+            word = game.readWord(active_player, sak)
+        elif active_player == pComputer:
+            word = pComputer.maxLetters(game)
         if word == 'q':
             game.gameOver(pHuman, pComputer)
         # Check if word exists
@@ -47,27 +50,16 @@ elif playerChoice == 3:
             game.passTurn(sak, active_player)
         else:
             # calculate word points and add it to the score of the active player
-            game.calculateWordPoints(active_player, word)
-            #
+            word_points = game.calculateWordPoints(word)
+            # Update active player's score
+            active_player.score += word_points
+            # Update sak
             game.updateSak(sak, active_player, word)
+            # Print game info
             game.printGameInfo(active_player, sak)
         # Change active player
         active_player = game.changePlayer(active_player, pHuman, pComputer)
 
-
 elif playerChoice == 4:
     print("Option4")
 
-# Print current letters for each player
-# pHuman.print_current_letters()
-# pComputer.print_current_letters()
-
-# Print current letters and their values
-# print("Letters of human player:")
-# pHuman.print_current_letters_formatted()
-# print("Letters of computer player:")
-# pComputer.print_current_letters_formatted()
-
-# Check remaining letters in the sak
-# print(sak.numberOfLetters)
-# print(sak.LETTER_QUANTITY)
