@@ -28,7 +28,6 @@ LETTER_VALUES = {
     "Χ": 8,
     "Ψ": 10,
     "Ω": 3,
-    "-": 0,
 }
 
 
@@ -58,7 +57,6 @@ class SakClass:
         "Χ": 1,
         "Ψ": 1,
         "Ω": 3,
-        "-": 2
     }
 
     def __init__(self, number_of_letters):
@@ -133,8 +131,16 @@ class Computer(Player):
     def __init__(self, name):
         super().__init__(name)
 
-    def play(self):
-        pass
+    def play(self, game, algorithmOption):
+        if algorithmOption == 1:
+            # Play min letters algorithm
+            return self.minLetters(game)
+        elif algorithmOption == 2:
+            # Play max letters algorithm
+            return self.maxLetters(game)
+        elif algorithmOption == 3:
+            # Play smart algorithm
+            return self.smart(game)
 
     def minLetters(self, game):
         print("^^^^^^^^minLetters algorithm^^^^^^^^")
@@ -149,7 +155,7 @@ class Computer(Player):
             for line in f:
                 word = line.strip()
                 if word in perms:
-                    print("word played by pc:", word)
+                    print("word played by pc:", word, " - ", game.calculateWordPoints(word), " points")
                     game.wordsformed += 1
                     return word
         print("Computer could not find valid word. Computer is passing its turn!")
@@ -163,7 +169,7 @@ class Computer(Player):
                 for line in f:
                     word = line.strip()
                     if word in perms:
-                        print("Word played by computer: ", word)
+                        print("Word played by computer: ", word, " - ", game.calculateWordPoints(word), " points")
                         game.wordsformed += 1
                         return word
         print("Computer could not find valid word. Computer is passing its turn!")
@@ -171,25 +177,29 @@ class Computer(Player):
 
     def smart(self, game):
         print("^^^^^^^^Smart algorithm^^^^^^^^")
-        max_letters = len(self.current_letters)
 
-        # Get all permutations of the available letters, from length 2 to max_letters
-        perms = chain.from_iterable(permutations(self.current_letters, r) for r in range(2, max_letters + 1))
+        # Get all permutations of the available letters, starting with length 2
+        perms = []
+        for i in range(2, len(self.current_letters) + 1):
+            for p in permutations(self.current_letters, i):
+                perms.append(''.join(p))
 
-        # Find all valid words in the dictionary (assuming uppercase)
-        valid_words = set()
+        # Find the valid words with the highest point value
+        max_word = ''
+        max_points = 0
         with open('greek7.txt', 'r', encoding='utf-8') as f:
             for line in f:
                 word = line.strip()
                 if word in perms:
-                    valid_words.add(word)
+                    points = game.calculateWordPoints(word)
+                    if points > max_points:
+                        max_word = word
+                        max_points = points
 
-        # Calculate the point value of each valid word
-        word_points = {word: game.calculateWordPoints(word) for word in valid_words}
-
-        # Find the word with the highest point value
-        if word_points:
-            return max(word_points, key=word_points.get)
+        if max_word:
+            print("Word played by computer: ", max_word, " - ", game.calculateWordPoints(max_word), " points")
+            game.wordsformed += 1
+            return max_word
         else:
             print("Computer could not find valid word. Computer is passing its turn!")
             return 'p'
@@ -269,7 +279,7 @@ class Game:
         # Show last game stats
         self.loadLastGameStats()
         # Show starting screen
-        self.displayStartingScreen()
+        # self.displayStartingScreen()
         # Initialize sak for human player
         pHuman.current_letters = sak.randomizeSak()
         # Initialize sak for pc player
@@ -351,3 +361,11 @@ class Game:
             print("-------------------------------------------------")
             print("No previous game stats found!")
             print("-------------------------------------------------")
+
+    def displaySettingScreen(self):
+        print("-----------------------------------------")
+        print("Please select the algorithm that you wish the Computer to play with. Choose 1,2 or 3")
+        print("1 - MIN LETTERS")
+        print("2 - MAX LETTERS")
+        print("3 - SMART")
+        print("-----------------------------------------")
