@@ -1,7 +1,7 @@
 import json
 import random
 import sys
-from itertools import chain, combinations, permutations
+from itertools import permutations
 
 LETTER_VALUES = {
     "Α": 1,
@@ -123,12 +123,18 @@ class Player:
 
 
 class Human(Player):
+
     def __init__(self, name):
         super().__init__(name)
+        self.totalWordsHuman = 0
+        self.totalPassesHuman = 0
 
 
 class Computer(Player):
+
     def __init__(self, name):
+        self.totalWordsComputer = 0
+        self.totalPassesComputer = 0
         super().__init__(name)
 
     def play(self, game, algorithmOption):
@@ -155,7 +161,7 @@ class Computer(Player):
             for line in f:
                 word = line.strip()
                 if word in perms:
-                    print("word played by pc:", word, " - ", game.calculateWordPoints(word), " points")
+                    print("Word played by computer:", word, " - ", game.calculateWordPoints(word), " points")
                     game.wordsformed += 1
                     return word
         print("Computer could not find valid word. Computer is passing its turn!")
@@ -213,9 +219,9 @@ class Game:
 
     def displayStartingScreen(self):
         """Displays the starting screen for the Scrabble game."""
-        print("******** SCRABBLE ********")
+        print("******** WELCOME TO SCRABBLE ********")
         print("-------------------------")
-        print("1: Score")
+        print("1: Stats")
         print("2: Settings")
         print("3: Play")
         print("4: Quit")
@@ -231,9 +237,15 @@ class Game:
             if word == 'q':
                 return word
             elif word == 'p':
+                # increase human player passes by one
+                active_player.totalPassesHuman += 1
                 return 'p'
             # Check if word cant be formed with the available letters and if it exists in the greek7.txt
             elif self.validateWord(active_player, word) and self.wordExists(active_player, word):
+                # Increase words formed by one
+                active_player.totalWordsHuman += 1
+                # Print word points message
+                print(f"Word played by {active_player.name}: {word} - {self.calculateWordPoints(word)} points")
                 return word
             else:
                 print("Invalid word. Please try again.")
@@ -277,7 +289,7 @@ class Game:
 
     def setup(self, pHuman, pComputer, sak):
         # Show last game stats
-        self.loadLastGameStats()
+        # self.loadLastGameStats()
         # Show starting screen
         # self.displayStartingScreen()
         # Initialize sak for human player
@@ -333,7 +345,11 @@ class Game:
             "computer_score": pComputer.score,
             "human_name": pHuman.name,
             "computer_name": pComputer.name,
-            "words_formed": self.wordsformed
+            "words_formed": self.wordsformed,
+            "words_formed_human": pHuman.totalWordsHuman,
+            "words_formed_computer": pComputer.totalWordsComputer,
+            "passes_computer": pComputer.totalPassesComputer,
+            "passes_human": pHuman.totalPassesHuman
         }
         with open("lastgamestats.json", "w") as f:
             json.dump(stats, f)
@@ -349,13 +365,21 @@ class Game:
             computer_score = stats["computer_score"]
             computer_name = stats["computer_name"]
             words_formed = stats["words_formed"]
+            words_formed_human = stats["words_formed_human"]
+            words_formed_computer = stats["words_formed_computer"]
+            passes_human = stats["passes_human"]
+            passes_computer = stats["passes_computer"]
 
             # print the stats to the console
             print("-------------------------------------------------")
             print("Last game stats:")
             print(f"Player: {human_name} - Score {human_score}")
             print(f"Player: {computer_name} - Score {computer_score}")
-            print(f"Words formed: {words_formed}")
+            print(f"Total words formed: {words_formed}")
+            print(f"Words formed by {human_name}: {words_formed_human}")
+            print(f"Words formed by Computer: {words_formed_computer}")
+            print(f"Total passes by {human_name}: {passes_human}")
+            print(f"Total passes by Computer: {passes_computer}")
             print("-------------------------------------------------")
         except FileNotFoundError:
             print("-------------------------------------------------")
