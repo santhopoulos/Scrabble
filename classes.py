@@ -93,6 +93,7 @@ class SakClass:
         return self.getLetters(7)
 
     def printSakStatus(self):
+        """Prints information about the current status of the Sak """
         print("Letters left:", self.LETTER_QUANTITY, "\n Letters remaining: ", self.numberOfLetters)
 
 
@@ -125,9 +126,9 @@ class Player:
 class Human(Player):
 
     def __init__(self, name):
-        super().__init__(name)
         self.totalWordsHuman = 0
         self.totalPassesHuman = 0
+        super().__init__(name)
 
 
 class Computer(Player):
@@ -149,7 +150,7 @@ class Computer(Player):
             return self.smart(game)
 
     def minLetters(self, game):
-        print("^^^^^^^^minLetters algorithm^^^^^^^^")
+        print("--- Min letters algorithm ---")
         # Get all permutations of the available letters, starting with length 2
         perms = []
         for i in range(2, len(self.current_letters) + 1):
@@ -168,7 +169,7 @@ class Computer(Player):
         return 'p'
 
     def maxLetters(self, game):
-        print("^^^^^^^^Max letters algorithm^^^^^^^^")
+        print("--- Max letters algorithm ---")
         for i in range(len(self.current_letters), 1, -1):
             perms = [''.join(p) for p in permutations(self.current_letters, i)]
             with open('greek7.txt', 'r', encoding='utf-8') as f:
@@ -182,7 +183,7 @@ class Computer(Player):
         return 'p'
 
     def smart(self, game):
-        print("^^^^^^^^Smart algorithm^^^^^^^^")
+        print("--- Smart algorithm ---")
 
         # Get all permutations of the available letters, starting with length 2
         perms = []
@@ -231,7 +232,7 @@ class Game:
         print(f"Player: {pHuman.name} - Score: {pHuman.score}")
         print(f"Player: {pComputer.name} - Score: {pComputer.score}")
 
-    def readWord(self, active_player, sak):
+    def readWord(self, active_player):
         while True:
             word = input("Enter your word or press 'p' to pass your turn or press 'q' to quit: ")
             if word == 'q':
@@ -241,7 +242,7 @@ class Game:
                 active_player.totalPassesHuman += 1
                 return 'p'
             # Check if word cant be formed with the available letters and if it exists in the greek7.txt
-            elif self.validateWord(active_player, word) and self.wordExists(active_player, word):
+            elif self.validateWord(active_player, word) and self.wordExists(word):
                 # Increase words formed by one
                 active_player.totalWordsHuman += 1
                 # Print word points message
@@ -260,7 +261,7 @@ class Game:
             available_letters.remove(letter)
         return True
 
-    def wordExists(self, player, word):
+    def wordExists(self, word):
         """Checks if the word is a valid word in greek7.txt"""
         with open('greek7.txt', 'r', encoding='utf-8') as f:
             for line in f:
@@ -287,20 +288,17 @@ class Game:
         print("Letters remaining in the sak: ", sak.numberOfLetters)
         print("******************************************************")
 
+    def printGameInfoAfterMove(self, player, sak):
+        print("------------------------------------------------------")
+        print("Player:", player.name, "- Score:", player.score, "- Letters remaining in the sak:", sak.numberOfLetters)
+        print("Available letters: ", player.current_letters)
+        print("------------------------------------------------------")
+
     def setup(self, pHuman, pComputer, sak):
-        # Show last game stats
-        # self.loadLastGameStats()
-        # Show starting screen
-        # self.displayStartingScreen()
         # Initialize sak for human player
         pHuman.current_letters = sak.randomizeSak()
         # Initialize sak for pc player
         pComputer.current_letters = sak.randomizeSak()
-
-    # def gameOver(self):
-    #     # Print gameOver info and declare the winner
-    #     # Save in a file game info like scores, number of words formed
-    #     sys.exit()
 
     def gameOver(self, pHuman, pComputer):
         if pHuman.score > pComputer.score:

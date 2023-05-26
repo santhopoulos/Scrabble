@@ -2,8 +2,9 @@ import sys
 
 from classes import SakClass, Game, Human, Computer
 
-# Create SakClass object
 # Scrabble in greek edition has 102 letters
+
+# Create SakClass object
 sak = SakClass(102)
 
 # Create game object
@@ -58,7 +59,7 @@ while True:
             game.printGameInfo(active_player, sak)
             # Read word and validate it
             if active_player == pHuman:
-                word = game.readWord(active_player, sak)
+                word = game.readWord(active_player)
             elif active_player == pComputer:
                 word = pComputer.play(game, algorithmOption)
                 # Increase computer counters
@@ -79,7 +80,7 @@ while True:
                 # Update sak
                 game.updateSak(sak, active_player, word)
                 # Print game info
-                # game.printGameInfo(active_player, sak)
+                game.printGameInfoAfterMove(active_player, sak)
             # Change active player
             active_player = game.changePlayer(active_player, pHuman, pComputer)
     elif playerChoice == 4:
