@@ -105,6 +105,7 @@ class Player:
         self.name = name
 
     def printCurrentLetters(self):
+        """Prints player's current letters"""
         print(self.current_letters)
 
     def printCurrentLettersFormatted(self):
@@ -139,6 +140,7 @@ class Computer(Player):
         super().__init__(name)
 
     def play(self, game, algorithmOption):
+        """Computer plays based on the algorithmOption parameter"""
         if algorithmOption == 1:
             # Play min letters algorithm
             return self.minLetters(game)
@@ -150,6 +152,7 @@ class Computer(Player):
             return self.smart(game)
 
     def minLetters(self, game):
+        """Implementation of the MIN LETTERS algorithm"""
         print("--- Min letters algorithm ---")
         # Get all permutations of the available letters, starting with length 2
         perms = []
@@ -169,6 +172,7 @@ class Computer(Player):
         return 'p'
 
     def maxLetters(self, game):
+        """Implementation of the MAX LETTERS algorithm"""
         print("--- Max letters algorithm ---")
         for i in range(len(self.current_letters), 1, -1):
             perms = [''.join(p) for p in permutations(self.current_letters, i)]
@@ -183,6 +187,7 @@ class Computer(Player):
         return 'p'
 
     def smart(self, game):
+        """Implemetation of the SMART algorithm"""
         print("--- Smart algorithm ---")
 
         # Get all permutations of the available letters, starting with length 2
@@ -229,10 +234,12 @@ class Game:
         print("-------------------------")
 
     def printScore(self, pHuman, pComputer):
+        """Prints current score"""
         print(f"Player: {pHuman.name} - Score: {pHuman.score}")
         print(f"Player: {pComputer.name} - Score: {pComputer.score}")
 
     def readWord(self, active_player):
+        """Reads word and returns """
         while True:
             word = input("Enter your word or press 'p' to pass your turn or press 'q' to quit: ")
             if word == 'q':
@@ -240,7 +247,7 @@ class Game:
             elif word == 'p':
                 # increase human player passes by one
                 active_player.totalPassesHuman += 1
-                return 'p'
+                return word
             # Check if word cant be formed with the available letters and if it exists in the greek7.txt
             elif self.validateWord(active_player, word) and self.wordExists(word):
                 # Increase words formed by one
@@ -280,6 +287,7 @@ class Game:
         return word_points
 
     def printGameInfo(self, player, sak):
+        """Prints player and game information"""
         print("******************************************************")
         print("Playing: ", player.name)
         print("Score: ", player.score)
@@ -289,18 +297,21 @@ class Game:
         print("******************************************************")
 
     def printGameInfoAfterMove(self, player, sak):
+        """Prints information right after a player or the pc has played its turn"""
         print("------------------------------------------------------")
         print("Player:", player.name, "- Score:", player.score, "- Letters remaining in the sak:", sak.numberOfLetters)
         print("Available letters: ", player.current_letters)
         print("------------------------------------------------------")
 
     def setup(self, pHuman, pComputer, sak):
+        """Initializes saks"""
         # Initialize sak for human player
         pHuman.current_letters = sak.randomizeSak()
         # Initialize sak for pc player
         pComputer.current_letters = sak.randomizeSak()
 
     def end(self, pHuman, pComputer):
+        """Ends game after printing game result information and saving it to a file """
         if pHuman.score > pComputer.score:
             winner = pHuman.name
         elif pHuman.score < pComputer.score:
@@ -316,21 +327,21 @@ class Game:
         sys.exit()
 
     def updateSak(self, sak, active_player, word):
+        """Updates sak after a play, performing the necessary actions"""
         for letter in word:
             if letter in active_player.current_letters:
                 active_player.current_letters.remove(letter)
         new_letters = sak.getLetters(7 - len(active_player.current_letters))
         active_player.current_letters.extend(new_letters)
-        # print("Updated current letters:", active_player.current_letters)
 
     def passTurn(self, sak, active_player):
+        """Passes turn, performing the necessary actions"""
         sak.putBackLetters(active_player.current_letters)
         active_player.current_letters = sak.getLetters(len(active_player.current_letters))
         print("Turn passed. New available letters: ", active_player.current_letters)
-        # print("LETTERS IN THE SAK:", sak.numberOfLetters)
-        # print(sak.LETTER_QUANTITY)
 
     def changePlayer(self, active_player, pHuman, pComputer):
+        """Changes active player"""
         if active_player == pHuman:
             active_player = pComputer
         else:
@@ -338,6 +349,7 @@ class Game:
         return active_player
 
     def saveGameStats(self, pHuman, pComputer, winner):
+        """Saves game statistics to a file called lastgamestats.json"""
         stats = {
             "winner": winner,
             "human_score": pHuman.score,
@@ -354,6 +366,7 @@ class Game:
             json.dump(stats, f)
 
     def loadLastGameStats(self):
+        """Loads stats from file lastgamestats.json and prints them"""
         try:
             with open("lastgamestats.json", "r") as f:
                 stats = json.load(f)
@@ -388,6 +401,7 @@ class Game:
             print("-------------------------------------------------")
 
     def displaySettingScreen(self):
+        """Displays settings screen"""
         print("-----------------------------------------")
         print("Please select the algorithm that you wish the Computer to play with. Choose 1, 2 or 3")
         print("1 - MIN LETTERS")

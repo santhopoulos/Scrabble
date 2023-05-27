@@ -28,7 +28,10 @@ def guidelines():
      If you choose 1 last game stats will appear.
      If you choose 2 you will be able to choose the algorithm to play the computer with
      If you choose 4 you will quit the game
-     If you choose 3 you will start playing the game.
+     If you choose 3 you will start playing the game. By default, the human plays first. Each time
+     you are informed with your current letters and their values, letters remaining in the sak,
+     your current score. After you type in a valid word you are informed about its points, your updated
+     score and your updated letters. This happens when it's time for the computer to play.
 
 
      IMPORTANT NOTES:
@@ -37,18 +40,16 @@ def guidelines():
 
      2) To be able to view the stats you will have to have played at least 1 game.
 
-     3) When it is your turn to find a word,
-     type it in UPPERCASE GREEK only. To pass your turn use 'p' and to quit use 'q'
+     3) When it is your turn to play a word,
+     type it in UPPERCASE GREEK only. To pass your turn use 'p' and to quit the game use 'q'
 
-
-
+    4) After typing a word or passing your turn, take some time to look through the printed information.
 
     Usage: help(guidelines) to view this documentation.
     """
 
 
 # Scrabble in greek edition has 102 letters (excluding wildcards)
-
 # Create SakClass object with 102 letters
 sak = SakClass(102)
 
