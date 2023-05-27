@@ -76,6 +76,12 @@ active_player = pHuman
 # Set default algorithm to MIN LETTERS
 algorithmOption = 1
 
+word_dictionary = {}
+# Load the words from the greek7.txt to a dictionary
+with open("greek7.txt", "r", encoding='utf-8') as file:
+    for line in file:
+        word = line.strip()
+        word_dictionary[word] = True
 
 while True:
     game.displayStartingScreen()
