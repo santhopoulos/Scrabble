@@ -300,7 +300,7 @@ class Game:
         # Initialize sak for pc player
         pComputer.current_letters = sak.randomizeSak()
 
-    def gameOver(self, pHuman, pComputer):
+    def end(self, pHuman, pComputer):
         if pHuman.score > pComputer.score:
             winner = pHuman.name
         elif pHuman.score < pComputer.score:
@@ -311,8 +311,8 @@ class Game:
         print(f"Player: {pHuman.name} - Score: {pHuman.score} ")
         print(f"Player: {pComputer.name} - Score: {pComputer.score}")
         print(f"Winner: {winner}")
-        # Save in a file game info like scores, number of words formed
-        self.saveGameStats(pHuman, pComputer)
+        # Save in a file game info like the winner, scores, number of words formed, number of passes etc
+        self.saveGameStats(pHuman, pComputer, winner)
         sys.exit()
 
     def updateSak(self, sak, active_player, word):
@@ -337,8 +337,9 @@ class Game:
             active_player = pHuman
         return active_player
 
-    def saveGameStats(self, pHuman, pComputer):
+    def saveGameStats(self, pHuman, pComputer, winner):
         stats = {
+            "winner": winner,
             "human_score": pHuman.score,
             "computer_score": pComputer.score,
             "human_name": pHuman.name,
@@ -358,6 +359,7 @@ class Game:
                 stats = json.load(f)
 
             # extract the stats from the JSON object
+            winner = stats["winner"]
             human_score = stats["human_score"]
             human_name = stats["human_name"]
             computer_score = stats["computer_score"]
@@ -371,6 +373,7 @@ class Game:
             # print the stats to the console
             print("-------------------------------------------------")
             print("Last game stats:")
+            print(f"Winner: {winner}")
             print(f"Player: {human_name} - Score {human_score}")
             print(f"Player: {computer_name} - Score {computer_score}")
             print(f"Total words formed: {words_formed}")
@@ -386,7 +389,7 @@ class Game:
 
     def displaySettingScreen(self):
         print("-----------------------------------------")
-        print("Please select the algorithm that you wish the Computer to play with. Choose 1,2 or 3")
+        print("Please select the algorithm that you wish the Computer to play with. Choose 1, 2 or 3")
         print("1 - MIN LETTERS")
         print("2 - MAX LETTERS")
         print("3 - SMART")

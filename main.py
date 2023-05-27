@@ -2,16 +2,61 @@ import sys
 
 from classes import SakClass, Game, Human, Computer
 
-# Scrabble in greek edition has 102 letters
 
-# Create SakClass object
+def guidelines():
+    """
+    Provides guidelines for playing Scrabble.
+
+    1) Classes implemented: SakClass, Game, Player, Human, Computer
+
+    2) Inheritance:
+    Base class: Player
+    Derived classes: Human, Computer
+
+    3) Extension methods in derived classes:
+    Class Computer: play(), minLetters(), maxLetters(), smart()
+    Class Human: -
+
+    4) Neither decorators nor operator overloading was needed in the Scrabble implementation.
+
+    5) Dictionary data structure was used to handle the available words.
+
+    6) MIN-MAX-SMART algorithms were implemented for the computer to play.
+
+    7) Gameflow:
+     User enters his name. A screen with the available options will appear. Choose 1, 2, 3 or 4
+     If you choose 1 last game stats will appear.
+     If you choose 2 you will be able to choose the algorithm to play the computer with
+     If you choose 4 you will quit the game
+     If you choose 3 you will start playing the game.
+
+
+     IMPORTANT NOTES:
+     1) By default the computer plays with the 'MIN LETTERS' algorithm. In case you want
+     a different algorithm, when starting the game go to settings and change it.
+
+     2) To be able to view the stats you will have to have played at least 1 game.
+
+     3) When it is your turn to find a word,
+     type it in UPPERCASE GREEK only. To pass your turn use 'p' and to quit use 'q'
+
+
+
+
+    Usage: help(guidelines) to view this documentation.
+    """
+
+
+# Scrabble in greek edition has 102 letters (excluding wildcards)
+
+# Create SakClass object with 102 letters
 sak = SakClass(102)
 
 # Create game object
 game = Game("Scrabble")
 
 # Read player's name
-nameHuman = input("Welcome to scrabble!\nEnter your name please: ")
+nameHuman = input("Welcome to Scrabble!\nEnter your name: ")
 
 # Create human object
 pHuman = Human(nameHuman)
@@ -68,7 +113,7 @@ while True:
                 else:
                     pComputer.totalWordsComputer += 1
             if word == 'q':
-                game.gameOver(pHuman, pComputer)
+                game.end(pHuman, pComputer)
             # Check if word exists
             elif word == 'p':
                 game.passTurn(sak, active_player)
@@ -83,6 +128,10 @@ while True:
                 game.printGameInfoAfterMove(active_player, sak)
             # Change active player
             active_player = game.changePlayer(active_player, pHuman, pComputer)
+            # Check if Sak is empty
+            if sak.numberOfLetters <= 0:
+                print("Sak has emptied! Game over!")
+                game.end(pHuman, pComputer)
     elif playerChoice == 4:
         print("Quitting the game...")
         sys.exit()
